@@ -8,12 +8,10 @@ everything to local text files.
 
 ## How to compile and run
 
-Requires JDK 11+ (uses `java.time`, records-free, tested on JDK 21).
+Requires JDK 16+ (uses pattern matching for `instanceof` and `java.time`).
 
 ```
-cd src
-javac -d ../bin *.java
-cd ../bin
+javac *.java
 java Main
 ```
 
@@ -32,12 +30,12 @@ New residents can also self-register from the login screen.
 
 ## Files
 
-Every UML class lives in its own `.java` file under `src/`:
+Every UML class lives in its own `.java` file in the project root:
 
 - `User.java`, `Resident.java`, `Admin.java`, `Staff.java`,
   `MedicalStaff.java`, `FoodStaff.java`, `TransportationStaff.java`
 - `AssistanceRequest.java`, `MedicalRequest.java`, `FoodRequest.java`,
-  `TransportationRequest.java`
+  `TransportationRequest.java`, `FoodItem.java`, `MedicalItem.java`
 - `RequestManager.java`, `FileManager.java`, `Main.java`
 - GUI: `LoginFrame.java`, `RegisterFrame.java`, `ResidentMenuFrame.java`,
   `AdminMenuFrame.java`, `StaffMenuFrame.java`
@@ -52,6 +50,10 @@ Every UML class lives in its own `.java` file under `src/`:
 - `displayDetails()` prints to console per the diagram; a
   `toDisplaySummary(): String` helper (overridden per subclass, i.e.
   polymorphism) feeds the same text into GUI tables/dialogs.
+- Requests share location, needed time, additional details, status, and
+  submission time. Food and medical requests store lists of typed items;
+  transportation requests store pickup, destination, and passenger count.
 - Data is stored as pipe-delimited (`|`) text under `data/users.txt` and
-  `data/requests.txt` so it survives restarts, satisfying the
-  FileManager's read/save/update/delete requirements.
+  `data/requests.txt` so it survives restarts. New request records escape
+  delimiter characters, and the FileManager continues to read existing
+  request records while saving new request structures.
