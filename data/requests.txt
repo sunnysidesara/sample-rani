@@ -1,1 +1,5 @@
 MEDICAL|REQ4000|RSD3000|Medical|Needed for hypertension|Help is OTW|2026-09-27T20:07:51|Amlodipine|1 box
+MEDICAL|REQ4001|RSD3000|Medical|dxed|Cancelled|2026-09-28T22:07:56|cde|xsd
+MEDICAL|REQ4002|RSD3000|Medical|dxew|Completed|2026-09-28T22:13:45|biogesic|4
+FOOD|REQ4003|RSD3000|Food|edxewdewds|Pending|2026-09-30T19:37:17|dxxeds|sdxds
+MEDICAL|REQ4004|RSD3000|Medical|ghg|Pending|2026-10-04T15:31:27|huj|jug
