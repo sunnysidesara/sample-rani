@@ -1,0 +1,5 @@
+Admin|admin|admin123|ADM1000
+MedicalStaff|Dr. Santos|med123|STF2000|Medical
+FoodStaff|Aling Nena|food123|STF2001|Food
+TransportationStaff|Mang Tomas|trans123|STF2002|Transportation
+Resident|Juan Dela Cruz|res123|RSD3000|123 Rizal St.|917123456
