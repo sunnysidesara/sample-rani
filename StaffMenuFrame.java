@@ -142,19 +142,22 @@ public class StaffMenuFrame extends JFrame {
         addDetailRow(detailsPanel, "Status", req.getStatus());
         addDetailRow(detailsPanel, "Submitted", req.getDateRequested().format(AssistanceRequest.DT_FMT));
 
-        if (req instanceof MedicalRequest medical) {
+        if (req instanceof MedicalRequest) {
+            MedicalRequest medical = (MedicalRequest) req;
             addDetailRow(detailsPanel, "Location", req.getLocation());
             int itemNumber = 1;
             for (MedicalItem item : medical.getMedicalItems()) {
                 addDetailRow(detailsPanel, "Medical item " + itemNumber++, item.toString());
             }
-        } else if (req instanceof FoodRequest food) {
+        } else if (req instanceof FoodRequest) {
+            FoodRequest food = (FoodRequest) req;
             addDetailRow(detailsPanel, "Location", req.getLocation());
             int itemNumber = 1;
             for (FoodItem item : food.getFoodItems()) {
                 addDetailRow(detailsPanel, "Food item " + itemNumber++, item.toString());
             }
-        } else if (req instanceof TransportationRequest transportation) {
+        } else if (req instanceof TransportationRequest) {
+            TransportationRequest transportation = (TransportationRequest) req;
             addDetailRow(detailsPanel, "Pickup location", transportation.getPickupLocation());
             addDetailRow(detailsPanel, "Destination", transportation.getDestination());
             addDetailRow(detailsPanel, "Passengers", String.valueOf(transportation.getPassengerCount()));
@@ -214,7 +217,7 @@ public class StaffMenuFrame extends JFrame {
         String newStatus = (String) statusBox.getSelectedItem();
         req.updateStatus(newStatus);
         fileManager.recordStaffRequestAction(staff, req, newStatus);
-        requestManager.updateRequest(req.getRequestId());
+        requestManager.updateRequest(req);
         refreshTable(searchField.getText().trim());
         JOptionPane.showMessageDialog(this, "Status updated to " + newStatus + ".");
     }

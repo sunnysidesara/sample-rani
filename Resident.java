@@ -15,6 +15,7 @@ public class Resident extends User {
 
     public String getResidentId() { return residentId; }
     public void setResidentId(String residentId) { this.residentId = residentId; }
+    @Override public String getUserId() { return residentId; }
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
     public String getContactNo() { return contactNo; }

@@ -19,6 +19,7 @@ public class Staff extends User {
 
     public String getStaffId() { return staffId; }
     public void setStaffId(String staffId) { this.staffId = staffId; }
+    @Override public String getUserId() { return staffId; }
     public String getAssignedType() { return assignedType; }
     public void setAssignedType(String assignedType) { this.assignedType = assignedType; }
 

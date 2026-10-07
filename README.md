@@ -8,7 +8,7 @@ everything to local text files.
 
 ## How to compile and run
 
-Requires JDK 16+ (uses pattern matching for `instanceof` and `java.time`).
+Requires JDK 11+.
 
 ```
 javac *.java

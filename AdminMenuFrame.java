@@ -164,16 +164,20 @@ public class AdminMenuFrame extends JFrame {
     private void refreshUserTable(String searchTerm) {
         userTableModel.setRowCount(0);
         String query = searchTerm == null ? "" : searchTerm.toLowerCase();
-        for (User u : fileManager.readUsers()) {
-            String id, extra;
-            if (u instanceof Resident r) {
-                id = r.getResidentId(); extra = r.getAddress() + " / " + r.getContactNo();
-            } else if (u instanceof Admin a) {
-                id = a.getAdminId(); extra = "-";
-            } else if (u instanceof Staff s) {
-                id = s.getStaffId(); extra = "Handles: " + s.getAssignedType();
-            } else {
-                id = "-"; extra = "-";
+        List<User> users = fileManager.readUsers();
+        for (User u : users) {
+            String id = "-";
+            String extra = "-";
+            if (u instanceof Resident) {
+                Resident resident = (Resident) u;
+                id = resident.getResidentId();
+                extra = resident.getAddress() + " / " + resident.getContactNo();
+            } else if (u instanceof Admin) {
+                id = ((Admin) u).getAdminId();
+            } else if (u instanceof Staff) {
+                Staff staff = (Staff) u;
+                id = staff.getStaffId();
+                extra = "Handles: " + staff.getAssignedType();
             }
             String searchable = (u.getRole() + " " + u.getFullName() + " " + id + " " + extra).toLowerCase();
             if (!query.isEmpty() && !searchable.contains(query)) continue;
@@ -215,19 +219,22 @@ public class AdminMenuFrame extends JFrame {
         addRequestDetailRow(detailFields, "Current status", request.getStatus());
         addRequestDetailRow(detailFields, "Submitted", request.getDateRequested().format(AssistanceRequest.DT_FMT));
 
-        if (request instanceof MedicalRequest medical) {
+        if (request instanceof MedicalRequest) {
+            MedicalRequest medical = (MedicalRequest) request;
             addRequestDetailRow(detailFields, "Location", request.getLocation());
             int itemNumber = 1;
             for (MedicalItem item : medical.getMedicalItems()) {
                 addRequestDetailRow(detailFields, "Medical item " + itemNumber++, item.toString());
             }
-        } else if (request instanceof FoodRequest food) {
+        } else if (request instanceof FoodRequest) {
+            FoodRequest food = (FoodRequest) request;
             addRequestDetailRow(detailFields, "Location", request.getLocation());
             int itemNumber = 1;
             for (FoodItem item : food.getFoodItems()) {
                 addRequestDetailRow(detailFields, "Food item " + itemNumber++, item.toString());
             }
-        } else if (request instanceof TransportationRequest transportation) {
+        } else if (request instanceof TransportationRequest) {
+            TransportationRequest transportation = (TransportationRequest) request;
             addRequestDetailRow(detailFields, "Pickup location", transportation.getPickupLocation());
             addRequestDetailRow(detailFields, "Destination", transportation.getDestination());
             addRequestDetailRow(detailFields, "Passengers", String.valueOf(transportation.getPassengerCount()));
@@ -379,11 +386,19 @@ public class AdminMenuFrame extends JFrame {
         JTextField nameField = new JTextField(u.getFullName());
         JTextField passwordField = new JTextField(u.getPassword());
         JTextField userIdField = new JTextField(oldUserId);
-        JTextField addressField = new JTextField(u instanceof Resident resident ? resident.getAddress() : "");
-        JTextField contactField = new JTextField(u instanceof Resident resident
-                ? String.valueOf(resident.getContactNo()) : "");
+        String address = "";
+        String contact = "";
+        if (u instanceof Resident) {
+            Resident resident = (Resident) u;
+            address = resident.getAddress();
+            contact = resident.getContactNo();
+        }
+        JTextField addressField = new JTextField(address);
+        JTextField contactField = new JTextField(contact);
         JComboBox<String> assignedTypeBox = new JComboBox<>(new String[]{"Medical", "Food", "Transportation"});
-        if (u instanceof Staff staff) assignedTypeBox.setSelectedItem(staff.getAssignedType());
+        if (u instanceof Staff) {
+            assignedTypeBox.setSelectedItem(((Staff) u).getAssignedType());
+        }
         JPanel panel = new JPanel(new GridLayout(0, 2, 6, 6));
         Runnable rebuildFields = () -> {
             String selectedRole = (String) roleBox.getSelectedItem();
@@ -473,8 +488,8 @@ public class AdminMenuFrame extends JFrame {
         } else {
             updatedUser = new TransportationStaff(newName, newPassword, newUserId);
         }
-        if (updatedUser instanceof Staff updatedStaff) {
-            updatedStaff.setAssignedType((String) assignedTypeBox.getSelectedItem());
+        if (updatedUser instanceof Staff) {
+            ((Staff) updatedUser).setAssignedType((String) assignedTypeBox.getSelectedItem());
         }
 
         if (u instanceof Resident && !oldUserId.equals(newUserId)) {
@@ -508,10 +523,7 @@ public class AdminMenuFrame extends JFrame {
     }
 
     private String getUserId(User user) {
-        if (user instanceof Resident resident) return resident.getResidentId();
-        if (user instanceof Admin adminUser) return adminUser.getAdminId();
-        if (user instanceof Staff staff) return staff.getStaffId();
-        return "";
+        return user.getUserId();
     }
 
     private void deleteUser(User u) {
@@ -527,7 +539,8 @@ public class AdminMenuFrame extends JFrame {
     private void viewSelectedUserHistory() {
         User u = getSelectedUser();
         if (u == null) return;
-        if (u instanceof Staff staff) {
+        if (u instanceof Staff) {
+            Staff staff = (Staff) u;
             DefaultTableModel model = new DefaultTableModel(
                     new Object[]{"Request ID", "Resident ID", "Type", "Status", "Processed At"}, 0) {
                 @Override public boolean isCellEditable(int row, int column) { return false; }
@@ -545,18 +558,19 @@ public class AdminMenuFrame extends JFrame {
                     JOptionPane.PLAIN_MESSAGE);
             return;
         }
-        if (!(u instanceof Resident r)) {
+        if (!(u instanceof Resident)) {
             JOptionPane.showMessageDialog(this, "History is available for Resident and Staff accounts.",
                     "Not Applicable", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
+        Resident resident = (Resident) u;
 
         DefaultTableModel model = new DefaultTableModel(new Object[]{"Request ID", "Type", "Status"}, 0) {
             @Override public boolean isCellEditable(int row, int column) { return false; }
         };
         for (AssistanceRequest req : requestManager.getAllRequests()) {
-            if (req.getResidentId().equals(r.getResidentId())) {
-            model.addRow(new Object[]{req.getRequestId(), req.getType(), req.getStatus()});
+            if (req.getResidentId().equals(resident.getResidentId())) {
+                model.addRow(new Object[]{req.getRequestId(), req.getType(), req.getStatus()});
             }
         }
         JTable historyTable = new JTable(model);
@@ -565,7 +579,7 @@ public class AdminMenuFrame extends JFrame {
             @Override public boolean isCellEditable(int row, int column) { return false; }
         };
         for (ResidentRequestHistory entry : fileManager.readResidentRequestHistory()) {
-            if (entry.getResidentId().equals(r.getResidentId())) {
+            if (entry.getResidentId().equals(resident.getResidentId())) {
                 updatesModel.addRow(new Object[]{entry.getRequestId(), entry.getAction(),
                         entry.getRequestSummary(), entry.getUpdatedAt().format(AssistanceRequest.DT_FMT)});
             }
@@ -575,6 +589,7 @@ public class AdminMenuFrame extends JFrame {
         tabs.addTab("Requests", new JScrollPane(historyTable));
         tabs.addTab("Request Updates", new JScrollPane(new JTable(updatesModel)));
         tabs.setPreferredSize(new Dimension(700, 320));
-        JOptionPane.showMessageDialog(this, tabs, "History for " + r.getFullName(), JOptionPane.PLAIN_MESSAGE);
+        JOptionPane.showMessageDialog(this, tabs, "History for " + resident.getFullName(),
+                JOptionPane.PLAIN_MESSAGE);
     }
 }

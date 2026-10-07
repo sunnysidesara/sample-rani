@@ -94,10 +94,7 @@ public class LoginFrame extends JFrame {
     }
 
     private String getUserId(User user) {
-        if (user instanceof Admin) return ((Admin) user).getAdminId();
-        if (user instanceof Staff) return ((Staff) user).getStaffId();
-        if (user instanceof Resident) return ((Resident) user).getResidentId();
-        return null;
+        return user.getUserId();
     }
 
     private boolean hasValidPrefix(String userId) {

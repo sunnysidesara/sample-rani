@@ -6,9 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * GUI for a logged-in Resident: submit / view / update / cancel their own requests.
- */
+
 public class ResidentMenuFrame extends JFrame {
     private final Resident resident;
     private final FileManager fileManager = new FileManager();
@@ -202,11 +200,14 @@ public class ResidentMenuFrame extends JFrame {
 
         RequestFormFields fields = new RequestFormFields();
         fields.setFromRequest(req);
-        if (req instanceof MedicalRequest medical) {
+        if (req instanceof MedicalRequest) {
+            MedicalRequest medical = (MedicalRequest) req;
             fields.setMedicalItems(medical.getMedicalItems());
-        } else if (req instanceof FoodRequest food) {
+        } else if (req instanceof FoodRequest) {
+            FoodRequest food = (FoodRequest) req;
             fields.setFoodItems(food.getFoodItems());
-        } else if (req instanceof TransportationRequest transportation) {
+        } else if (req instanceof TransportationRequest) {
+            TransportationRequest transportation = (TransportationRequest) req;
             fields.pickupField.setText(transportation.getPickupLocation());
             fields.destinationField.setText(transportation.getDestination());
             fields.passengerCountField.setText(String.valueOf(transportation.getPassengerCount()));
@@ -235,16 +236,19 @@ public class ResidentMenuFrame extends JFrame {
         req.setLocation(fields.locationField.getText().trim());
         req.setTimeNeeded(parseWhenNeeded(fields.whenNeededField.getText().trim()));
         req.setAdditionalDetails(fields.additionalDetailsArea.getText().trim());
-        if (req instanceof MedicalRequest medical) {
+        if (req instanceof MedicalRequest) {
+            MedicalRequest medical = (MedicalRequest) req;
             medical.setMedicalItems(fields.readMedicalItems());
-        } else if (req instanceof FoodRequest food) {
+        } else if (req instanceof FoodRequest) {
+            FoodRequest food = (FoodRequest) req;
             food.setFoodItems(fields.readFoodItems());
-        } else if (req instanceof TransportationRequest transportation) {
+        } else if (req instanceof TransportationRequest) {
+            TransportationRequest transportation = (TransportationRequest) req;
             transportation.setPickupLocation(fields.pickupField.getText().trim());
             transportation.setDestination(fields.destinationField.getText().trim());
             transportation.setPassengerCount(Integer.parseInt(fields.passengerCountField.getText().trim()));
         }
-        requestManager.updateRequest(req.getRequestId());
+        requestManager.updateRequest(req);
         fileManager.recordResidentRequestAction(resident, req, "Updated");
         JOptionPane.showMessageDialog(this, "Request updated.");
         refreshTable();
@@ -552,7 +556,7 @@ public class ResidentMenuFrame extends JFrame {
                 "Confirm Cancel", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             req.updateStatus("Cancelled");
-            requestManager.updateRequest(req.getRequestId());
+            requestManager.updateRequest(req);
             fileManager.recordResidentRequestAction(resident, req, "Cancelled");
             JOptionPane.showMessageDialog(this, "Request marked as cancelled.");
             refreshTable();

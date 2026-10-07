@@ -13,6 +13,7 @@ public class Admin extends User {
 
     public String getAdminId() { return adminId; }
     public void setAdminId(String adminId) { this.adminId = adminId; }
+    @Override public String getUserId() { return adminId; }
 
     public void createUser(User user) {
         if (user == null) throw new IllegalArgumentException("User is required.");
@@ -26,15 +27,12 @@ public class Admin extends User {
     public void deleteUser(String userId) {
         FileManager fileManager = new FileManager();
         List<User> users = fileManager.readUsers();
-        users.removeIf(user -> getUserId(user).equals(userId));
+        for (int i = users.size() - 1; i >= 0; i--) {
+            if (users.get(i).getUserId().equals(userId)) {
+                users.remove(i);
+            }
+        }
         fileManager.saveAllUsers(users);
-    }
-
-    private String getUserId(User user) {
-        if (user instanceof Resident resident) return resident.getResidentId();
-        if (user instanceof Admin admin) return admin.getAdminId();
-        if (user instanceof Staff staff) return staff.getStaffId();
-        return "";
     }
 
     public void viewAllRequest() { System.out.println(getFullName() + " is viewing all requests."); }

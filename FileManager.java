@@ -14,8 +14,6 @@ public class FileManager {
     private static final String REQUEST_FILE = DATA_DIR + File.separator + "requests.txt";
     private static final String STAFF_HISTORY_FILE = DATA_DIR + File.separator + "staff_history.txt";
     private static final String RESIDENT_HISTORY_FILE = DATA_DIR + File.separator + "resident_history.txt";
-    private final Map<String, AssistanceRequest> stagedRequestUpdates = new HashMap<>();
-
     public FileManager() {
         ensureDataFiles();
     }
@@ -97,7 +95,7 @@ public class FileManager {
         return prefix + (highestId + 1);
     }
 
-    // ---------------------------------------------------------------- USERS
+    
 
     /** Reads and reconstructs every user account from disk. */
     public List<User> readUsers() {
@@ -301,31 +299,20 @@ public class FileManager {
         }
     }
 
-    /** Stages the edited request and persists it using the UML request-ID API. */
+    /** Replaces the saved request with its updated version. */
     public void updateRequestFile(AssistanceRequest updated) {
-        stagedRequestUpdates.put(updated.getRequestId(), updated);
-        updateRequestFile(updated.getRequestId());
-    }
-
-    /** Finds the request with this ID and persists its staged changes. */
-    public void updateRequestFile(String requestId) {
         List<AssistanceRequest> all = readRequests();
-        AssistanceRequest updated = stagedRequestUpdates.remove(requestId);
-        if (updated == null) {
-            for (AssistanceRequest request : all) {
-                if (request.getRequestId().equals(requestId)) {
-                    updated = request;
-                    break;
-                }
-            }
-        }
-        if (updated == null) return;
-
+        boolean found = false;
         for (int i = 0; i < all.size(); i++) {
-            if (all.get(i).getRequestId().equals(requestId)) {
+            if (all.get(i).getRequestId().equals(updated.getRequestId())) {
                 all.set(i, updated);
+                found = true;
                 break;
             }
+        }
+        if (!found) {
+            System.err.println("Could not update missing request: " + updated.getRequestId());
+            return;
         }
         rewriteRequests(all);
     }

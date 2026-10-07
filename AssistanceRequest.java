@@ -2,9 +2,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-/**
- * Base class for all assistance requests filed by residents.
- */
+
 public abstract class AssistanceRequest implements Serializable {
     public static final DateTimeFormatter DT_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 

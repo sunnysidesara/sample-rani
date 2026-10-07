@@ -1,8 +1,5 @@
 import java.io.Serializable;
 
-/**
- * Abstract base class for every account type in the system.
- */
 public abstract class User implements Serializable {
     private String password;
     private String fullName;
@@ -15,7 +12,6 @@ public abstract class User implements Serializable {
         this.role = role;
     }
 
-    // Encapsulation: getters/setters
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
     public String getFullName() { return fullName; }
@@ -42,6 +38,7 @@ public abstract class User implements Serializable {
     /** Each role renders its own menu window (polymorphism). */
     public abstract void showMenu();
 
-    /** Converts this user to a pipe-delimited line for file storage. Subclasses append their own fields. */
+    public abstract String getUserId();
+
     public abstract String toFileLine();
 }

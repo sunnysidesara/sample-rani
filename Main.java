@@ -4,10 +4,6 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Entry point: initializes the FileManager, seeds dummy data on first run,
- * and launches the login GUI window.
- */
 public class Main {
     public static void main(String[] args) {
         try {
@@ -20,7 +16,7 @@ public class Main {
         SwingUtilities.invokeLater(() -> new LoginFrame(fileManager).setVisible(true));
     }
 
-    /** Loads a handful of sample accounts/requests so the app is usable on a fresh checkout. */
+    
     private static void seedDummyDataIfEmpty(FileManager fm) {
         List<User> users = fm.readUsers();
         if (users.isEmpty()) {
